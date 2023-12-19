@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Paciente = require('../models/pacienteModel');
-
+//POST
 exports.postPaciente = async (req, res) => {
   try {
     const nuevoPaciente = new Paciente(req.body);
@@ -11,7 +11,18 @@ exports.postPaciente = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al guardar el paciente.' });
   }
 };
+//GET ** TODOS
+exports.getPacientes = async (req, res) => {
+  try {
+    const pacientes = await Paciente.find();
+    res.json(pacientes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: 'Error al obtener la lista de pacientes.' });
+  }
+};
 
+//GET ** BY ID
 exports.getPacienteById = async (req, res) => {
   try {
     const pacienteId = req.params.id;
@@ -29,12 +40,50 @@ exports.getPacienteById = async (req, res) => {
   }
 };
 
-exports.getPacientes = async (req, res) => {
+const mongoose = require('mongoose');
+const Paciente = require('../models/pacienteModel');
+
+//ACTUALIZAR
+exports.actualizarPaciente = async (req, res) => {
   try {
-    const pacientes = await Paciente.find();
-    res.json(pacientes);
+    const pacienteId = req.params.id;
+    const datosActualizados = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(pacienteId)) {
+      return res.status(400).json({ mensaje: 'ID no válido.' });
+    }
+
+    const pacienteActualizado = await Paciente.findByIdAndUpdate(pacienteId, datosActualizados, { new: true });
+
+    if (!pacienteActualizado) {
+      return res.status(404).json({ mensaje: 'Paciente no encontrado.' });
+    }
+    res.json(pacienteActualizado);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ mensaje: 'Error al obtener la lista de pacientes.' });
+    res.status(500).json({ mensaje: 'Error al actualizar el paciente.' });
+  }
+};
+
+
+//ELIMINAR
+
+exports.eliminarPaciente = async (req, res) => {
+  try {
+    const pacienteId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(pacienteId)) {
+      return res.status(400).json({ mensaje: 'ID no válido.' });
+    }
+
+    const pacienteEliminado = await Paciente.findByIdAndDelete(pacienteId);
+    if (!pacienteEliminado) {
+      return res.status(404).json({ mensaje: 'Paciente no encontrado.' });
+    }
+
+    res.json(pacienteEliminado);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: 'Error al eliminar el paciente.' });
   }
 };
