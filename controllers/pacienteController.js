@@ -4,6 +4,8 @@ const Paciente = require('../models/pacienteModel');
 exports.postPaciente = async (req, res) => {
   try {
     const nuevoPaciente = new Paciente(req.body);
+    nuevoPaciente.fechaIngreso=new Date.now();
+    nuevoPaciente.revisado=false;
     await nuevoPaciente.save();
     res.status(201).json(nuevoPaciente);
   } catch (error) {
@@ -39,9 +41,6 @@ exports.getPacienteById = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al obtener el paciente por ID.' });
   }
 };
-
-const mongoose = require('mongoose');
-const Paciente = require('../models/pacienteModel');
 
 //ACTUALIZAR
 exports.actualizarPaciente = async (req, res) => {
